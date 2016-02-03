@@ -4,17 +4,29 @@
 
 Sync a user's `authorized_keys` file with one in a Git repository.
 
-## Install
+## Installation
 
 ### RHEL
 
-* psmisc
 * Get the .rpm file (create one, if needed: `make rpm`) and install it: `rpm -i maitred-0.2.0-1.noarch.rpm`
 * Create a user that will be used to login: `useradd -m -s /bin/bash access`
 * Optional: allow the user sudo without password: `echo "access ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/access && chmod 0440 /etc/sudoers.d/*`
 * Add contents of `/root/.ssh/id_rsa.pub` to "cni-build" github user (https://github.com/settings/ssh) to allow your server access to the github repository
     * If root account doesn't have a public key, generate one: `ssh-keygen`
-* Add configuration to `/etc/maitred.conf` (see `maitred.sample.conf` for example)
+* Add configuration to `/etc/maitred.conf` (see `maitred.sample.conf` for example), using the username created above.
+* Run `chkconfig --name maitred`
+* Run `service maitred start`
+All done!
+
+By default, logs are saved to `/var/log/maitred/maitred.log`
+ 
+If you have any issues, try running `maitred /etc/maitred.conf` to see the full output.
+
+#### Example configuration for Brightcove repository:
+```
+ACCESS_USER=access
+ACCESS_REPO="git@github.com:conde-nast-international/publickeys-brightcove.git"
+```
 
 
 ### Dev and Ubuntu
