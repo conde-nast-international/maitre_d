@@ -10,7 +10,7 @@ dev: var/log/maitred
 	fpm -s dir -t deb -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src/ubuntu --prefix / --config-files /etc/maitred.conf --depends git .
 
 rpm: var/log/maitred
-	fpm -s dir -t deb -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src/rhel --prefix / --config-files /etc/maitred.conf --depends git .
+	/usr/local/share/gems/gems/fpm-1.4.0/bin/fpm -s dir -t rpm -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src/rhel --prefix / --config-files /etc/maitred.conf --depends git .
 
 var/log/maitred:
 	mkdir -p var/log/maitred
