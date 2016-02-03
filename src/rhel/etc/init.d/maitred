@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#
+# Super ultra basic startup script maitred: Maintain authorized key files
+#
+# chkconfig: - 85 15
+# description: MySQL is a fast DB server.
+# processname: maitred
+# pidfile: /var/run/maitred.pid
+# config: /etc/maitred.conf
+
+DAEMON=/usr/bin/maitred
+CONFIG=/etc/maitred.conf
+PIDFILE=/var/run/maitred.pid
+
+# Exit if the package is not installed
+[ -x $DAEMON ] || exit 98
+
+[ ! -r $CONFIG ] && echo "error: missing $CONFIG" >&2 && exit 99
+
+RETVAL=0
+
+start() {
+        [ ! -d "/var/log/maitred" ] && mkdir /var/log/maitred
+        touch /var/log/maitred/maitred.log
+
+        echo -n "Starting $DAEMON: "
+        $DAEMON $CONFIG >/dev/null 2>&1 &
+        RETVAL=$?
+        return $RETVAL
+}
+
+stop() {
+        echo -n $"Stopping $DAEMON: "
+        killall maitred
+
+        RETVAL=$?
+        return $RETVAL
+}
+
+
+
+# See how we were called.
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+
+  *)
+        echo $"Usage: /etc/init.d/maitred {start|stop}"
+        exit 1
+        exit 1
+esac
+
+exit $RETVAL

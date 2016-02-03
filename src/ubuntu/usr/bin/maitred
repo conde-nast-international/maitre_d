@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR="$(dirname ${0})"
+CMD="${BASEDIR}/maitred-refresh"
+
+function error {
+    echo "error: ${1}" >&2
+    exit 1
+}
+
+function log {
+    echo "$(date) - $1" >> $LOG_FILE
+    echo "$(date) - $1" >&2
+}
+
+if [ $# -lt 1 ]; then
+    error "missing conf parameter"
+fi
+
+CONF=$1
+
+LOG_FILE="$(cat ${CONF} | grep '^LOG=' | cut -d '=' -f 2)"
+if [ -z "${LOG_FILE}" ]; then
+    LOG_FILE='/var/log/maitred/maitred.log'
+fi
+
+if ! grep -q '_USER' "${CONF}"; then
+    error "conf must contain at least one :PREFIX_USER definition"
+fi
+
+while [ true ]; do
+    cat $CONF | grep '_USER' | cut -d '_' -f 1 | xargs -I '@' env -i bash -c "set -e; source ${CONF}; echo \"${CMD} '\${@_USER}' '\${@_REPO}' '${LOG_FILE}'\" | bash"
+    sleep 10
+done

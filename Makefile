@@ -7,9 +7,12 @@ clean:
 	rm -r var/ || :
 
 dev: var/log/maitred
-	fpm -s dir -t deb -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src --prefix / --config-files /etc/maitred.conf --depends git .
+	fpm -s dir -t deb -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src/ubuntu --prefix / --config-files /etc/maitred.conf --depends git .
+
+rpm: var/log/maitred
+	fpm -s dir -t deb -n "maitred" --maintainer 'paulina.budzon@condenastint.com' --vendor 'condenastint' -v 0.2.0 -a all -C ./src/rhel --prefix / --config-files /etc/maitred.conf --depends git .
 
 var/log/maitred:
 	mkdir -p var/log/maitred
 
-.PHONY: clean deb
+.PHONY: clean deb rpm

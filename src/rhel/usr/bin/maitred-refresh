@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+
+function error {
+    echo "error: ${1}" >&2
+    exit 1
+}
+
+function log {
+    echo "$(date) - $1" >> $LOG_FILE
+    echo "$(date) - $1" >&2
+}
+
+if [ $# -lt 3 ]; then
+    echo "usage: $(basename ${0}) <user> <repo> <log_file>" >&2
+    error "missing parameters"
+fi
+
+USER=$1
+REPO=$2
+LOG_FILE=$3
+
+USER_DIR="/home/${USER}"
+if [ ! -d "${USER_DIR}" ]; then
+    error "cannot find user dir at '${USER_DIR}'"
+fi
+
+if [ ! -w "${LOG_FILE}" ]; then
+    error "cannot write to log file at '${LOG_FILE}'"
+fi
+
+TMP="/tmp/maitred"
+mkdir -p $TMP
+CLONE_DIR="$(echo ${REPO} | sha1sum | cut -d ' ' -f 1)"
+REPO_TMP="${TMP}/${CLONE_DIR}"
+
+if [ ! -d "${REPO_TMP}" ]; then
+    ssh-keyscan -4 github.com 2>/dev/null > ~/.ssh/known_hosts
+    git clone "${REPO}" "${REPO_TMP}"
+fi
+
+log "checking for updates to ${REPO}"
+
+DIFF=$(cd ${REPO_TMP}; git fetch 2>&1 1>/dev/null; git diff --stat origin/master 2>/dev/null)
+
+if [ ! -z "${DIFF}" ]; then
+    UPDATE=$(cd "${REPO_TMP}"; git pull origin master 2>&1 1>/dev/null; git rev-parse HEAD)
+    log "Updates detected. Now at ${UPDATE}."
+fi
+
+TARGET_DIR="/home/${USER}/.ssh"
+TARGET="${TARGET_DIR}/authorized_keys"
+
+if [ ! -r "${TARGET}" ]; then
+    mkdir -p "${TARGET_DIR}"
+    touch "${TARGET}"
+fi
+
+cat "${REPO_TMP}/authorized_keys" > $TARGET
+
+chown "${USER}":"${USER}" "${TARGET_DIR}"
+chown "${USER}":"${USER}" "${TARGET}"
+
+chmod 0700 "${TARGET_DIR}"
+chmod 0600 "${TARGET}"

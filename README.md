@@ -6,6 +6,19 @@ Sync a user's `authorized_keys` file with one in a Git repository.
 
 ## Install
 
+### RHEL
+
+* psmisc
+* Get the .rpm file (create one, if needed: `make rpm`) and install it: `rpm -i maitred-0.2.0-1.noarch.rpm`
+* Create a user that will be used to login: `useradd -m -s /bin/bash access`
+* Optional: allow the user sudo without password: `echo "access ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/access && chmod 0440 /etc/sudoers.d/*`
+* Add contents of `/root/.ssh/id_rsa.pub` to "cni-build" github user (https://github.com/settings/ssh) to allow your server access to the github repository
+    * If root account doesn't have a public key, generate one: `ssh-keygen`
+* Add configuration to `/etc/maitred.conf` (see `maitred.sample.conf` for example)
+
+
+### Dev and Ubuntu
+
 First, create a simple git repositiory with an `authorized_keys` file.
 
 ```
