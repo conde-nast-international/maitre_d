@@ -14,7 +14,7 @@ Sync a user's `authorized_keys` file with one in a Git repository.
 * Add contents of `/root/.ssh/id_rsa.pub` to "cni-build" github user (https://github.com/settings/ssh) to allow your server access to the github repository
     * If root account doesn't have a public key, generate one: `ssh-keygen`
 * Add configuration to `/etc/maitred.conf` (see `maitred.sample.conf` for example), using the username created above.
-* Run `chkconfig --name maitred`
+* Run `chkconfig --add maitred`
 * Run `service maitred start`
 All done!
 
